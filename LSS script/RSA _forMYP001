@@ -1,0 +1,89 @@
+/home/karmey77/Desktop/DSN_AGE/BEH/7_DistanceDiffMat.tsv
+
+
+require("RNifti")
+require("Hmisc")
+setwd("/home/karmey77/Desktop/DSN_AGE/MRI_Pilot")
+stimDiffM = read.table("/home/karmey77/Desktop/DSN_AGE/forMYP001.tsv",
+                       header = T, sep = '\t')
+stimDiffM = abs(stimDiffM)
+check = c()
+i = 1
+grp = c("NII_Y","NII_O")[i]
+grp
+stimDiffM
+yo = c()
+
+j = 1
+
+subID = list.files(path = file.path(".", grp))[j]
+print(subID)
+sbj.dir = file.path(".", paste(grp, list.files(path = file.path(".", grp)),sep = "/")[j])
+beta_dir = file.path(sbj.dir,list.files(path = sbj.dir, pattern = "trial_beta"))
+beta.list  = list.files(path = beta_dir, pattern = "tval")
+
+check = c()
+
+token = 1
+    for(i_trial in 1:54)
+    {
+      print(paste("Reading", paste("Trial", i_trial, sep = '_')))
+      assign(paste("Trial", i_trial, sep = '_'),
+             readNifti(paste(beta_dir ,beta.list[i_trial], sep = '/')))
+    }
+
+
+RSA = array(NA, dim = dim(Trial_1))
+print(paste("Calculating RSA of", subID))
+dev.new(width = 5, height = 4)
+plot(NA, xlim = c(0,1), ylim = c(0,100), xlab = subID, ylab = "%", main = "Progress")
+total_progress = length(Trial_1[,1,1])*length(Trial_1[1,,1])*length(Trial_1[1,1,])
+progress_now = 0
+
+for (x in 2:(length(Trial_1[,1,1])-2)) # X corrdinate
+{
+  for (y in 2:(length(Trial_1[1,,1])-2)) # Y corrdinate
+  {
+    for (z in 2:(length(Trial_1[1,1,])-2)) # Z corrdinate
+    {
+      betaMat = matrix(NA,
+                       length(as.vector(eval(as.name(paste0("Trial_",1)))[c((x-2):(x+2)),c((y-2):(y+2)),c((z-2):(z+2))])),
+                       54)
+      
+      for (b in 1:54)
+      {
+        betaMat[,b] = as.vector(eval(as.name(paste0("Trial_",b)))[c((x-2):(x+2)),c((y-2):(y+2)),c((z-2):(z+2))])
+      }
+      
+      betaSim = rcorr(betaMat, type = "pearson")$r
+      # betaDisSim  = (1-betaSim)/2
+	betaDisSim  = dist(t(betaMat))
+      
+      # extract only half of the martix
+      
+	# RSA[x,y,z] = round(as.numeric(atanh(cor(as.vector(as.matrix(betaDisSim)), 
+        #                                         as.vector(as.matrix(stimDiffM)), 
+        #                                         method = 'pearson'))),4)
+
+      RSA[x,y,z] = round(as.numeric(atanh(cor(betaDisSim, 
+                                              stimDiffM[lower.tri(stimDiffM, diag = F)], 
+                                              method = 'pearson'))),4)
+      
+      progress_now = progress_now + 1
+      percent = progress_now/total_progress*100
+      rect(.4,percent,.6,percent, col = "2", border = NULL)
+      
+      if(!is.na(RSA[x,y,z]) && RSA[x,y,z] > 0)
+      {
+        check = append(check, c(x, y, z, RSA[x,y,z]))
+      }
+    }
+  }
+}
+
+RSA.temp = RSA
+RSA.temp = asNifti(RSA.temp, reference = Trial_1)
+
+writeNifti(atanh(RSA.temp),
+           paste0(beta_dir, "/RSAresult.nii"))
+print(paste(subID, "ends"))

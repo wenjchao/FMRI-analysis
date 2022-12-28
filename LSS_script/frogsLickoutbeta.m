@@ -1,5 +1,9 @@
 function [token] = frogsLickoutbeta(subID, i_run, i_trial, token)
 
+% Anonymous function mimicking contains
+contains = @(str, pattern) ~cellfun('isempty', strfind(str, pattern));
+% contains = @(str, pattern) ~cellfun(@isempty, strfind(str, pattern));
+
 if contains(subID, "Y")
     grp = "Y";
     grp2 = "Young";

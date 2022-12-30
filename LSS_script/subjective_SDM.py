@@ -12,9 +12,11 @@ with open("./1_總表.csv", 'r') as file:
       count = 0
       continue
 
+    #將總表內row[0]的數據存入subject(受試者名)
     if count%int(56) == 0:
       subject.append(row[0])
     
+    #將總表內row[10]的數據存入DJ(subjective distance)
     DJ[int(count/56)][count%int(56)] = row[10]
     count += 1
     
@@ -24,8 +26,8 @@ with open("./1_總表.csv", 'r') as file:
 #print(DJ)
 #print(subject)
 
+#建立SDM Matrix
 Matrix = [[[0 for i in range(56)] for j in range(56)] for k in range(48)]
-
 for k in range(48):
   for j in range(56):
     for i in range(56):

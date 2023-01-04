@@ -31,11 +31,11 @@ Matrix = [[[0 for i in range(56)] for j in range(56)] for k in range(48)]
 for k in range(48):
   for j in range(56):
     for i in range(56):
-      Matrix[k][j][i]= int(DJ[k][i]) - int(DJ[k][j])
+      Matrix[k][j][i]= abs(int(DJ[k][i]) - int(DJ[k][j]))
 
 #print(Matrix[0])
 
-# """"
+"""
 with open( subject[0]+'.csv', 'w', newline='') as csvfile:
   # 建立 CSV 檔寫入器
   writer = csv.writer(csvfile)
@@ -53,4 +53,4 @@ for k in range(48):
     for i in range(56):
       writer.writerow(Matrix[k][i])
 
-"""
+#"""

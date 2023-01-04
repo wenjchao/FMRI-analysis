@@ -1,0 +1,4 @@
+MYP001 run2 trial 6-7 要刪掉
+
+sshfs wenj@140.112.123.8:/bml/Data/Bank3/DSN_AGE Remote_Disk
+umount Remote_Disk

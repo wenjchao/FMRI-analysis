@@ -28,29 +28,34 @@ with open("./1_總表.csv", 'r') as file:
 
 #建立SDM Matrix
 Matrix = [[[0 for i in range(56)] for j in range(56)] for k in range(48)]
-for k in range(48):
-  for j in range(56):
-    for i in range(56):
-      Matrix[k][j][i]= abs(int(DJ[k][i]) - int(DJ[k][j]))
-
-#print(Matrix[0])
-
-"""
-with open( subject[0]+'.csv', 'w', newline='') as csvfile:
-  # 建立 CSV 檔寫入器
-  writer = csv.writer(csvfile)
-  # 寫入資料
-  for i in range(56):
-    writer.writerow(Matrix[0][i])
-    
-"""
 
 for k in range(48):
-  with open( subject[k]+'.csv', 'w', newline='') as csvfile:
-    # 建立 CSV 檔寫入器
-    writer = csv.writer(csvfile)
-    # 寫入資料
+  if k != 3:
+    for j in range(56):
+      for i in range(56):
+        Matrix[k][j][i]= abs(int(DJ[k][i]) - int(DJ[k][j]))
+        
+  #刪除trial 13,14
+  if k == 3:
     for i in range(56):
-      writer.writerow(Matrix[k][i])
+      if i > 13:
+        DJ[k][i-2] = DJ[k][i]
+    for j in range(54):
+      for i in range(54):
+        Matrix[k][j][i]= abs(int(DJ[k][i]) - int(DJ[k][j]))
 
-#"""
+for k in range(48):
+  if k != 3:
+    with open( subject[k]+'.csv', 'w', newline='') as csvfile:
+      # 建立 CSV 檔寫入器
+      writer = csv.writer(csvfile)
+      # 寫入資料
+      for i in range(56):
+        writer.writerow(Matrix[k][i])
+  if k == 3:
+    with open( subject[k]+'.csv', 'w', newline='') as csvfile:
+      # 建立 CSV 檔寫入器
+      writer = csv.writer(csvfile)
+      # 寫入資料
+      for i in range(54):
+        writer.writerow(Matrix[3][i])
